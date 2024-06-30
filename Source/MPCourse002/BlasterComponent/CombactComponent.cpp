@@ -88,7 +88,7 @@ void UCombactComponent::MulticastFire_Implementation()
 	if(BlasterCharacter)
 	{
 		BlasterCharacter->PlayFireMontage(bAiming);
-		EquippedWeapon->Fire();
+		EquippedWeapon->Fire(HitTarget);
 	}
 }
 
@@ -127,22 +127,20 @@ void UCombactComponent::TraceUnderCrossHairs(FHitResult &TraceHitResult)
 		if(!TraceHitResult.bBlockingHit)
 		{
 			TraceHitResult.ImpactPoint = End;
+			HitTarget = End;
 		} 
 		else 
 		{
+			HitTarget = TraceHitResult.ImpactPoint;
 			DrawDebugSphere(
 				GetWorld(),
 				TraceHitResult.ImpactPoint,
 				12.f,
 				13,
 				FColor::Red
-			);
+			); 
 		}
-
-
 	}
-
-
 }
 
 void UCombactComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -151,7 +149,7 @@ void UCombactComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 	FHitResult HitResult;
 	TraceUnderCrossHairs(HitResult);
-
+	
 	// ...
 }
 

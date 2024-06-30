@@ -66,6 +66,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	bool bFireButtonPressed;
 
+	FVector HitTarget;
+
 public:	
 	// Called every frame
 };
