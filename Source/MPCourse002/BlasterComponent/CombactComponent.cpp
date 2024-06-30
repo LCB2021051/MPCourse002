@@ -18,6 +18,13 @@ UCombactComponent::UCombactComponent()
 	// ...
 }
 
+void UCombactComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UCombactComponent,EquippedWeapon);
+	DOREPLIFETIME(UCombactComponent,bAiming);
+}
 
 void UCombactComponent::BeginPlay()
 {
@@ -38,6 +45,7 @@ void UCombactComponent::SetAiming(bool bIsAiming)
 	}
 }
 
+// Server RPC
 void UCombactComponent::ServerSetAiming_Implementation(bool bIsAiming)
 {
 	bAiming = bIsAiming;
@@ -58,8 +66,24 @@ void UCombactComponent::FireButtonPressed(bool bPressed)
 {
 	bFireButtonPressed = bPressed;
 
+	if(bFireButtonPressed)
+	{
+		ServerFire();
+
+	}	
+}
+
+// Server RPC
+void UCombactComponent::ServerFire_Implementation() 
+{
+	MulticastFire();
+}
+
+// Multicast RPC
+void UCombactComponent::MulticastFire_Implementation()
+{
 	if(EquippedWeapon == nullptr) return;
-	if(BlasterCharacter && bFireButtonPressed)
+	if(BlasterCharacter)
 	{
 		BlasterCharacter->PlayFireMontage(bAiming);
 		EquippedWeapon->Fire();
@@ -73,13 +97,7 @@ void UCombactComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	// ...
 }
 
-void UCombactComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UCombactComponent,EquippedWeapon);
-	DOREPLIFETIME(UCombactComponent,bAiming);
-}
 
 void UCombactComponent::EquipWeapon(AWeapon *WeaponToEquip)
 {

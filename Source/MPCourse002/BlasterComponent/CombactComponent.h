@@ -38,6 +38,12 @@ protected:
 
 	void FireButtonPressed(bool bPressed);
 
+	UFUNCTION(Server,Reliable)
+	void ServerFire(); // server RPC
+
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastFire(); // server RPC
+
 
 private:
 	ABlasterCharacter* BlasterCharacter;
