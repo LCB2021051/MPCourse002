@@ -8,10 +8,12 @@
 #include "Components/SphereComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
 
 UCombactComponent::UCombactComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
 	BaseWalkSpeed = 600.f;
 	AimWalkSpeed = 450.f;
@@ -90,9 +92,65 @@ void UCombactComponent::MulticastFire_Implementation()
 	}
 }
 
+void UCombactComponent::TraceUnderCrossHairs(FHitResult &TraceHitResult)
+{
+	FVector2D ViewportSize; 
+	if(GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+	
+	FVector2D CrosshairLocation(ViewportSize.X / 2.f , ViewportSize.Y / 2.f); 
+
+	FVector CrossHairWorldPosition;
+	FVector CrossHairWorldDirection;
+
+	bool Successful = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this,0),
+		CrosshairLocation,
+		CrossHairWorldPosition,
+		CrossHairWorldDirection
+	);
+
+	if(Successful)
+	{
+		FVector Start = CrossHairWorldPosition;
+		FVector End = CrossHairWorldDirection + CrossHairWorldDirection * TRACE_LENGTH;
+
+		GetWorld()->LineTraceSingleByChannel(
+			TraceHitResult,
+			Start,
+			End,
+			ECollisionChannel::ECC_Visibility
+		);
+
+		if(!TraceHitResult.bBlockingHit)
+		{
+			TraceHitResult.ImpactPoint = End;
+		} 
+		else 
+		{
+			DrawDebugSphere(
+				GetWorld(),
+				TraceHitResult.ImpactPoint,
+				12.f,
+				13,
+				FColor::Red
+			);
+		}
+
+
+	}
+
+
+}
+
 void UCombactComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	FHitResult HitResult;
+	TraceUnderCrossHairs(HitResult);
 
 	// ...
 }
