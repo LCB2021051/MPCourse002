@@ -8,6 +8,8 @@
 
 class UBoxComponent;
 class UProjectileMovementComponent;
+class UParticleSystem;
+class UParticleSystemComponent;
 
 UCLASS()
 class MPCOURSE002_API AProjectile : public AActor
@@ -21,11 +23,19 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+private:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* CollisionBox;
 
 	UPROPERTY(EditAnywhere)
 	UProjectileMovementComponent* ProjectileMovementComponent;	
+
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* Tracer;
+
+	UParticleSystemComponent* TracerComponent;
+
+
 public:	
 
 };
