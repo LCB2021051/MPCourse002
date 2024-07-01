@@ -41,10 +41,10 @@ protected:
 	void FireButtonPressed(bool bPressed);
 
 	UFUNCTION(Server,Reliable)
-	void ServerFire(); // server RPC
+	void ServerFire(const FVector_NetQuantize& TracerHitTarget); // server RPC
 
 	UFUNCTION(NetMulticast,Reliable)
-	void MulticastFire(); // Multicast RPC
+	void MulticastFire(const FVector_NetQuantize& TracerHitTarget); // Multicast RPC
 
 	void TraceUnderCrossHairs(FHitResult& TraceHitResult);
 
@@ -65,9 +65,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	bool bFireButtonPressed;
-
-	FVector HitTarget;
-
+	
 public:	
 	// Called every frame
 };

@@ -70,25 +70,26 @@ void UCombactComponent::FireButtonPressed(bool bPressed)
 
 	if(bFireButtonPressed)
 	{
-		ServerFire();
-
+		FHitResult HitResult;
+		TraceUnderCrossHairs(HitResult);
+		ServerFire(HitResult.ImpactPoint);
 	}	
 }
 
 // Server RPC
-void UCombactComponent::ServerFire_Implementation() 
+void UCombactComponent::ServerFire_Implementation(const FVector_NetQuantize& TracerHitTarget) 
 {
-	MulticastFire();
+	MulticastFire(TracerHitTarget);
 }
 
 // Multicast RPC
-void UCombactComponent::MulticastFire_Implementation()
+void UCombactComponent::MulticastFire_Implementation(const FVector_NetQuantize& TracerHitTarget)
 {
 	if(EquippedWeapon == nullptr) return;
 	if(BlasterCharacter)
 	{
 		BlasterCharacter->PlayFireMontage(bAiming);
-		EquippedWeapon->Fire(HitTarget);
+		EquippedWeapon->Fire(TracerHitTarget);
 	}
 }
 
@@ -123,34 +124,12 @@ void UCombactComponent::TraceUnderCrossHairs(FHitResult &TraceHitResult)
 			End,
 			ECollisionChannel::ECC_Visibility
 		);
-
-		if(!TraceHitResult.bBlockingHit)
-		{
-			TraceHitResult.ImpactPoint = End;
-			HitTarget = End;
-		} 
-		else 
-		{
-			HitTarget = TraceHitResult.ImpactPoint;
-			DrawDebugSphere(
-				GetWorld(),
-				TraceHitResult.ImpactPoint,
-				12.f,
-				13,
-				FColor::Red
-			); 
-		}
 	}
 }
 
 void UCombactComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	FHitResult HitResult;
-	TraceUnderCrossHairs(HitResult);
-	
-	// ...
 }
 
 

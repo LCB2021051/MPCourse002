@@ -35,7 +35,6 @@ private:
 
 	UParticleSystemComponent* TracerComponent;
 
-
 public:	
 
 };
